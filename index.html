@@ -236,14 +236,16 @@
 
   <header>
     <h1>잡케어 &amp; 경력개발로드맵</h1>
-    <div class="slide-count">총 48 슬라이드</div>
+    <!-- 여기 숫자는 JS가 자동 업데이트합니다 -->
+    <div class="slide-count">총 0 슬라이드</div>
   </header>
 
   <main>
     <div id="grid"></div>
   </main>
 
-  <footer>잡케어 &amp; 경력개발로드맵 · 총 48 슬라이드</footer>
+  <!-- footer 문구도 JS가 자동 업데이트합니다 -->
+  <footer>잡케어 &amp; 경력개발로드맵 · 총 0 슬라이드</footer>
 
   <button class="top-btn" id="topBtn">↑</button>
 
@@ -261,34 +263,77 @@
   </div>
 
   <script>
-    const TOTAL = 48;
     const grid = document.getElementById('grid');
 
-    function pad(n) { return String(n).padStart(3, '0'); }
-
-    for (let i = 1; i <= TOTAL; i++) {
-      const card = document.createElement('div');
-      card.className = 'slide-card';
-      card.innerHTML = `
-        <div class="slide-label">슬라이드 ${i}</div>
-        <div class="slide-img-wrap">
-          <img src="assets/${pad(i)}.PNG" alt="슬라이드 ${i}" loading="lazy" />
-        </div>`;
-      card.addEventListener('click', () => openLightbox(i));
-      grid.appendChild(card);
-    }
-
-    // Lightbox
-    let current = 1;
+    // Lightbox elements
     const lightbox = document.getElementById('lightbox');
     const lbImg = document.getElementById('lb-img');
     const lbLabel = document.getElementById('lb-label');
 
-    function openLightbox(n) {
-      current = n;
-      lbImg.src = 'assets/' + pad(n) + '.PNG';
-      lbImg.alt = '슬라이드 ' + n;
-      lbLabel.textContent = '슬라이드 ' + n + ' / ' + TOTAL;
+    // Scroll-to-top button
+    const topBtn = document.getElementById('topBtn');
+
+    let files = [];        // ["001.PNG", "002.PNG", ...]
+    let total = 0;
+    let currentIndex = 0;  // 0-based
+
+    async function loadManifest() {
+      // GitHub Pages 캐시 방지용 (업로드 직후 갱신 안 되는 경우 대비)
+      const res = await fetch('assets/manifest.json?v=' + Date.now());
+      if (!res.ok) throw new Error('manifest.json 로드 실패: ' + res.status);
+
+      const list = await res.json();
+
+      // 이미지 파일명만 필터 + 정렬(혹시 순서 섞여 있어도 안정적으로)
+      files = (Array.isArray(list) ? list : [])
+        .filter(name => typeof name === 'string' && /\.(png|jpg|jpeg|webp|gif)$/i.test(name))
+        .sort((a, b) => a.localeCompare(b, 'en'));
+
+      total = files.length;
+
+      updateCounts(total);
+      renderGrid(files);
+    }
+
+    function updateCounts(n) {
+      const slideCountEl = document.querySelector('.slide-count');
+      const footerEl = document.querySelector('footer');
+
+      if (slideCountEl) slideCountEl.textContent = `총 ${n} 슬라이드`;
+      if (footerEl) footerEl.textContent = `잡케어 & 경력개발로드맵 · 총 ${n} 슬라이드`;
+    }
+
+    function renderGrid(fileList) {
+      grid.innerHTML = '';
+
+      fileList.forEach((fileName, idx) => {
+        const slideNo = idx + 1;
+
+        const card = document.createElement('div');
+        card.className = 'slide-card';
+        card.innerHTML = `
+          <div class="slide-label">슬라이드 ${slideNo}</div>
+          <div class="slide-img-wrap">
+            <img src="assets/${fileName}" alt="슬라이드 ${slideNo}" loading="lazy" />
+          </div>`;
+
+        card.addEventListener('click', () => openLightboxByIndex(idx));
+        grid.appendChild(card);
+      });
+    }
+
+    function openLightboxByIndex(idx) {
+      if (!files.length) return;
+
+      currentIndex = (idx + total) % total;
+
+      const slideNo = currentIndex + 1;
+      const fileName = files[currentIndex];
+
+      lbImg.src = 'assets/' + fileName;
+      lbImg.alt = '슬라이드 ' + slideNo;
+      lbLabel.textContent = '슬라이드 ' + slideNo + ' / ' + total;
+
       lightbox.classList.add('active');
       document.body.style.overflow = 'hidden';
     }
@@ -298,36 +343,52 @@
       document.body.style.overflow = '';
     }
 
+    // Lightbox buttons
     document.getElementById('lb-close').addEventListener('click', closeLightbox);
-    document.getElementById('lb-prev').addEventListener('click', () => openLightbox(current > 1 ? current - 1 : TOTAL));
-    document.getElementById('lb-next').addEventListener('click', () => openLightbox(current < TOTAL ? current + 1 : 1));
+    document.getElementById('lb-prev').addEventListener('click', () => openLightboxByIndex(currentIndex - 1));
+    document.getElementById('lb-next').addEventListener('click', () => openLightboxByIndex(currentIndex + 1));
     lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
 
     // Swipe support for lightbox
     let touchStartX = 0;
-    lightbox.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+    lightbox.addEventListener('touchstart', e => {
+      touchStartX = e.touches[0].clientX;
+    }, { passive: true });
+
     lightbox.addEventListener('touchend', e => {
       const dx = e.changedTouches[0].clientX - touchStartX;
       if (Math.abs(dx) > 50) {
-        dx < 0
-          ? openLightbox(current < TOTAL ? current + 1 : 1)
-          : openLightbox(current > 1 ? current - 1 : TOTAL);
+        dx < 0 ? openLightboxByIndex(currentIndex + 1) : openLightboxByIndex(currentIndex - 1);
       }
     });
 
+    // Keyboard support
     document.addEventListener('keydown', e => {
       if (!lightbox.classList.contains('active')) return;
       if (e.key === 'Escape') closeLightbox();
-      if (e.key === 'ArrowLeft') openLightbox(current > 1 ? current - 1 : TOTAL);
-      if (e.key === 'ArrowRight') openLightbox(current < TOTAL ? current + 1 : 1);
+      if (e.key === 'ArrowLeft') openLightboxByIndex(currentIndex - 1);
+      if (e.key === 'ArrowRight') openLightboxByIndex(currentIndex + 1);
     });
 
     // Scroll to top button
-    const topBtn = document.getElementById('topBtn');
     window.addEventListener('scroll', () => {
       topBtn.classList.toggle('visible', window.scrollY > 300);
     });
-    topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    topBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Boot
+    loadManifest().catch(err => {
+      console.error(err);
+      grid.innerHTML = `
+        <div style="padding:16px; border:1px solid #dde5f0; border-radius:12px; background:#fff;">
+          <b>이미지 목록을 불러오지 못했어요.</b><br/>
+          <span style="color:#7a8aaa;">assets/manifest.json 파일이 존재하는지, JSON 형식이 맞는지 확인해주세요.</span>
+        </div>`;
+      updateCounts(0);
+    });
   </script>
 </body>
 </html>
