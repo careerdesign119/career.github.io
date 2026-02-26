@@ -272,7 +272,7 @@
       card.innerHTML = `
         <div class="slide-label">슬라이드 ${i}</div>
         <div class="slide-img-wrap">
-          <img src="assets/${pad(i)}.png" alt="슬라이드 ${i}" loading="lazy" />
+          <img src="assets/${pad(i)}.PNG" alt="슬라이드 ${i}" loading="lazy" />
         </div>`;
       card.addEventListener('click', () => openLightbox(i));
       grid.appendChild(card);
@@ -286,7 +286,7 @@
 
     function openLightbox(n) {
       current = n;
-      lbImg.src = 'assets/' + pad(n) + '.png';
+      lbImg.src = 'assets/' + pad(n) + '.PNG';
       lbImg.alt = '슬라이드 ' + n;
       lbLabel.textContent = '슬라이드 ' + n + ' / ' + TOTAL;
       lightbox.classList.add('active');
