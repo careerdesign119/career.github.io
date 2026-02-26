@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>잡케어 & 경력개발로드맵</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --surface: #f4f7fb;
+      --border: #dde5f0;
+      --accent: #1a56c4;
+      --accent-light: #e8effe;
+      --text: #1a1a1a;
+      --text-muted: #7a8aaa;
+      --label: #1a56c4;
+      --shadow: 0 2px 16px rgba(26,86,196,0.08);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Nanum Gothic', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* HEADER */
+    header {
+      background: #fff;
+      border-bottom: 2px solid var(--accent);
+      padding: 28px 20px 22px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(26,86,196,0.08);
+    }
+
+    h1 {
+      font-family: 'Nanum Gothic', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+      font-size: clamp(20px, 5vw, 34px);
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    .slide-count {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    /* MAIN */
+    main {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 28px 16px 60px;
+    }
+
+    /* SLIDE CARD — full width, single column */
+    .slide-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.18s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .slide-card:active {
+      transform: scale(0.99);
+    }
+
+    .slide-card:hover {
+      box-shadow: 0 6px 28px rgba(26,86,196,0.13);
+    }
+
+    .slide-label {
+      padding: 7px 16px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--label);
+      letter-spacing: 0.08em;
+      background: var(--accent-light);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .slide-label::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .slide-img-wrap {
+      width: 100%;
+      line-height: 0;
+      background: var(--surface);
+    }
+
+    .slide-img-wrap img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    /* LIGHTBOX */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(5,15,40,0.92);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .lightbox.active { display: flex; }
+
+    .lb-inner {
+      position: relative;
+      max-width: 100%;
+      max-height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .lb-inner img {
+      max-width: 96vw;
+      max-height: 82vh;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .lb-label {
+      text-align: center;
+      color: rgba(255,255,255,0.55);
+      font-size: 12px;
+      margin-top: 12px;
+      letter-spacing: 0.08em;
+    }
+
+    .lb-close {
+      position: absolute;
+      top: -14px;
+      right: -14px;
+      background: var(--accent);
+      border: none;
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .lb-nav-row {
+      display: flex;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .lb-nav {
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: #fff;
+      font-size: 22px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+
+    .lb-nav:hover, .lb-nav:active { background: rgba(26,86,196,0.5); }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 24px 20px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Scroll to top button */
+    .top-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 20px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(26,86,196,0.3);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 500;
+    }
+
+    .top-btn.visible { display: flex; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>잡케어 &amp; 경력개발로드맵</h1>
+    <div class="slide-count">총 48 슬라이드</div>
+  </header>
+
+  <main>
+    <div id="grid"></div>
+  </main>
+
+  <footer>잡케어 &amp; 경력개발로드맵 · 총 48 슬라이드</footer>
+
+  <button class="top-btn" id="topBtn">↑</button>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <div class="lb-inner">
+      <button class="lb-close" id="lb-close">✕</button>
+      <img id="lb-img" src="" alt=""/>
+      <div class="lb-label" id="lb-label"></div>
+      <div class="lb-nav-row">
+        <button class="lb-nav" id="lb-prev">‹</button>
+        <button class="lb-nav" id="lb-next">›</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const TOTAL = 48;
+    const grid = document.getElementById('grid');
+
+    function pad(n) { return String(n).padStart(3, '0'); }
+
+    for (let i = 1; i <= TOTAL; i++) {
+      const card = document.createElement('div');
+      card.className = 'slide-card';
+      card.innerHTML = `
+        <div class="slide-label">슬라이드 ${i}</div>
+        <div class="slide-img-wrap">
+          <img src="assets/${pad(i)}.png" alt="슬라이드 ${i}" loading="lazy" />
+        </div>`;
+      card.addEventListener('click', () => openLightbox(i));
+      grid.appendChild(card);
+    }
+
+    // Lightbox
+    let current = 1;
+    const lightbox = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lb-img');
+    const lbLabel = document.getElementById('lb-label');
+
+    function openLightbox(n) {
+      current = n;
+      lbImg.src = 'assets/' + pad(n) + '.png';
+      lbImg.alt = '슬라이드 ' + n;
+      lbLabel.textContent = '슬라이드 ' + n + ' / ' + TOTAL;
+      lightbox.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('lb-close').addEventListener('click', closeLightbox);
+    document.getElementById('lb-prev').addEventListener('click', () => openLightbox(current > 1 ? current - 1 : TOTAL));
+    document.getElementById('lb-next').addEventListener('click', () => openLightbox(current < TOTAL ? current + 1 : 1));
+    lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+
+    // Swipe support for lightbox
+    let touchStartX = 0;
+    lightbox.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+    lightbox.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 50) {
+        dx < 0
+          ? openLightbox(current < TOTAL ? current + 1 : 1)
+          : openLightbox(current > 1 ? current - 1 : TOTAL);
+      }
+    });
+
+    document.addEventListener('keydown', e => {
+      if (!lightbox.classList.contains('active')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') openLightbox(current > 1 ? current - 1 : TOTAL);
+      if (e.key === 'ArrowRight') openLightbox(current < TOTAL ? current + 1 : 1);
+    });
+
+    // Scroll to top button
+    const topBtn = document.getElementById('topBtn');
+    window.addEventListener('scroll', () => {
+      topBtn.classList.toggle('visible', window.scrollY > 300);
+    });
+    topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  </script>
+</body>
+</html>
